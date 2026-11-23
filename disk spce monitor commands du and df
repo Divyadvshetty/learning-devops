@@ -1,0 +1,154 @@
+Question	                             Simple answer
+What is df?	                       Checks filesystem disk space.
+What is du?	                       Checks file and folder storage usage.
+Difference between df and du?	     df checks filesystem capacity; du checks directory and file usage.
+What is df -h?	                   Shows disk space in readable units.
+What is du -sh?	                   Shows the total size of a folder.Execute the project step by step
+  
+Run each command separately. After running it, check the output before moving to the next command.
+Step 1 – Create project folder
+mkdir linux-disk-monitor
+
+
+Meaning: Creates a new folder for our project.
+Step 2 – Enter project folder
+cd linux-disk-monitor
+
+
+Meaning: Moves inside the project folder.
+Step 3 – Check location
+pwd
+
+
+Meaning: Shows where you are currently working.
+Step 4 – Create subfolders
+mkdir storage reports sample-data
+
+
+Meaning: Creates three folders:
+- storage – sample storage files.
+- reports – disk usage reports.
+- sample-data – sample files.
+Step 5 – View folders
+ls
+
+
+Meaning: Displays all three folders.
+Step 6 – Check total disk space
+df -h
+
+
+Meaning: Shows total, used and available disk space in an easy-to-read format.
+
+Example output:
+Filesystem      Size  Used  Avail  Use%
+/dev/root        20G   8G     12G   40%
+
+
+Your actual output will be different.
+Step 7 – Check disk space of current project
+df -h .
+
+
+Meaning: Shows the disk space of the filesystem containing your current project.
+Step 8 – Check filesystem type
+df -hT
+
+
+Meaning: Displays disk space along with filesystem type.
+Step 9 – Check inode usage
+df -i
+
+
+Meaning: Shows how many file and directory entries are used and available.
+Step 10 – Create sample files
+touch sample-data/file1.txt sample-data/file2.txt sample-data/file3.txt
+
+
+Meaning: Creates three empty files.
+Step 11 – Add sample content
+echo "Linux Disk Monitoring Project" > sample-data/file1.txt
+
+
+Meaning: Writes text into file1.txt.
+Step 12 – Create storage test files
+Run these one by one:
+dd if=/dev/zero of=storage/file5MB.bin bs=1M count=5 status=none
+
+
+Creates a 5 MB sample file.
+dd if=/dev/zero of=storage/file10MB.bin bs=1M count=10 status=none
+
+
+Creates a 10 MB sample file.
+dd if=/dev/zero of=storage/file20MB.bin bs=1M count=20 status=none
+
+
+Creates a 20 MB sample file.
+
+These are test files, not real documents.
+Step 13 – Check individual file sizes
+du -h storage/
+
+
+Meaning: Displays the storage used by files inside the storage folder.
+Step 14 – Check total storage size
+du -sh storage/
+
+
+Meaning: Displays the total storage used by the storage folder.
+Step 15 – Compare all folder sizes
+du -sh *
+
+
+Meaning: Shows the size of each folder and file in your project.
+Step 16 – Find the largest folders first
+du -sh * | sort -hr
+
+
+Meaning:
+- du -sh * – Checks sizes.
+- sort – Arranges results.
+- -h – Understands KB, MB and GB.
+- -r – Reverses the order, showing largest first.
+Step 17 – Display the top five largest items
+du -sh * | sort -hr | head -n 5
+
+
+Meaning: Shows the five largest files or folders.
+Step 18 – Save disk report
+df -h > reports/disk-report.txt
+
+
+Meaning: Saves disk information into a report file.
+Step 19 – Add folder usage to the report
+du -sh * >> reports/disk-report.txt
+
+
+Meaning: Adds folder sizes to the same report without deleting the previous contents.
+Step 20 – Read your final report
+cat reports/disk-report.txt
+
+
+Meaning: Displays the saved disk monitoring report.
+Step 21 – Final project verification
+ls -R
+
+
+Meaning: Displays all files and folders in your project.
+Part 3: Expected project structure
+After completing all commands, your project should look similar to this:
+linux-disk-monitor/
+│
+├── storage/
+│   ├── file5MB.bin
+│   ├── file10MB.bin
+│   └── file20MB.bin
+│
+├── reports/
+│   └── disk-report.txt
+│
+└── sample-data/
+    ├── file1.txt
+    ├── file2.txt
+    └── file3.txt
