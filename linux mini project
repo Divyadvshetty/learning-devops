@@ -1,0 +1,185 @@
+Build a Production Incident Triage & Automated Log Remediation Toolkit right inside your Killercoda Ubuntu 24.04 environment—a practical, real-world mini-project that unites every command from your list (grep, sed, awk, pwd, cd, rm, systemctl, cp, tr, cut, uname, ls, command -v, which, type, file, journalctl) into a portfolio-ready repository.
+Because Killercoda sessions are ephemeral (they reset when your browser tab closes), the smartest workflow is to build, test, and screenshot everything in Killercoda, then push the script and generated report directly to GitHub so your work is preserved permanently.
+
+1. Why You Are Doing This & How It Helps DevOps Teams Daily
+
+In real-world DevOps, SRE, and Production Support roles, engineers rarely run isolated commands. When an alert fires at 2:00 AM, an on-call engineer must rapidly:
+1. Verify host health and dependencies (uname, command -v, which, type, systemctl) before running recovery scripts.
+2. Safely isolate and back up corrupted configs or noisy logs (pwd, cd, ls, cp, file, rm) without causing data loss.
+3. Extract, sanitize, and summarize failure patterns (grep, cut, tr, sed, awk, journalctl) from massive log streams to find root causes in seconds rather than hours.
+By automating this entire workflow into a single Bash triage toolkit, you prove to recruiters and hiring managers that you don't just memorize syntax—you solve operational bottlenecks.
+
+2. Project Architecture & Command Mapping
+
+Show Code
+Download diagram SVG
+Every single command from your list has a dedicated job in this project:
+• Environment & Binary Verification: uname, command -v, which, type, systemctl
+• Workspace & Artifact Management: pwd, cd, ls, file, cp, rm
+• Log Parsing & Config Healing: journalctl, grep, cut, tr, sed, awk
+
+3. Step-by-Step Implementation Guide (Run in Killercoda)
+
+
+Step 1: Set Up the Project Workspace & Simulated Production Incident
+
+Create a clean repository folder and generate realistic broken configurations and application logs so you never touch critical OS files:
+bash
+mkdir -p ~/linux-incident-triage-toolkit/{logs,configs,backups,reports,scripts}
+cd ~/linux-incident-triage-toolkit
+pwd
+
+# 1. Create a simulated production config with an accidental debug flag & insecure HTTP setting
+cat << 'EOF' > configs/payment-service.conf
+SERVICE_NAME=payment-gateway
+ENVIRONMENT=staging
+LOG_LEVEL=DEBUG
+API_ENDPOINT=http://internal-billing.local
+MAX_RETRIES=3
+EOF
+
+# 2. Create a simulated application access/error log
+cat << 'EOF' > logs/payment-app.log
+2026-11-23T09:10:01Z | INFO  | ip=10.0.1.12 | user=alice | status=200 | latency=45ms
+2026-11-23T09:11:14Z | ERROR | ip=10.0.1.45 | user=bob   | status=502 | latency=1200ms
+2026-11-23T09:12:03Z | WARN  | ip=10.0.1.19 | user=charlie | status=429 | latency=310ms
+2026-11-23T09:13:40Z | ERROR | ip=10.0.1.45 | user=bob   | status=504 | latency=5000ms
+2026-11-23T09:14:22Z | ERROR | ip=10.0.1.88 | user=dave  | status=500 | latency=980ms
+2026-11-23T09:15:05Z | INFO  | ip=10.0.1.12 | user=alice | status=200 | latency=38ms
+EOF
+
+# 3. Create a stale temporary lock file to clean up later
+touch logs/stale_triage.tmp
+Use code with caution.
+
+Step 2: Create the Automated Triage & Remediation Script
+
+Save this complete script as scripts/incident_triage.sh. It executes your entire command list in a structured production workflow:
+bash
+cat << 'EOF' > scripts/incident_triage.sh
+#!/usr/bin/env bash
+set -euo pipefail
+
+BASE_DIR="$HOME/linux-incident-triage-toolkit"
+cd "$BASE_DIR"
+
+REPORT_FILE="reports/incident_summary_$(date +%Y%m%d_%H%M%S).txt"
+
+echo "==========================================" | tee "$REPORT_FILE"
+echo " AUTOMATED LINUX INCIDENT TRIAGE REPORT   " | tee -a "$REPORT_FILE"
+echo "==========================================" | tee -a "$REPORT_FILE"
+
+# 1. Host & Dependency Discovery (uname, command -v, which, type)
+echo -e "\n[1] SYSTEM & TOOLCHAIN VERIFICATION" | tee -a "$REPORT_FILE"
+echo "Working Directory : $(pwd)" | tee -a "$REPORT_FILE"
+echo "Kernel & Arch     : $(uname -srm)" | tee -a "$REPORT_FILE"
+
+for tool in awk sed grep journalctl systemctl; do
+  if command -v "$tool" >/dev/null 2>&1; then
+    echo "Verified binary   : $(which "$tool") ($(type -t "$tool"))" | tee -a "$REPORT_FILE"
+  else
+    echo "CRITICAL: Missing required tool $tool" | tee -a "$REPORT_FILE"
+    exit 1
+  fi
+done
+
+# 2. File Integrity & Backup (ls, file, cp)
+echo -e "\n[2] ARTIFACT INSPECTION & SAFE BACKUP" | tee -a "$REPORT_FILE"
+ls -lh configs/ logs/ | tee -a "$REPORT_FILE"
+echo "Config MIME check : $(file -b configs/payment-service.conf)" | tee -a "$REPORT_FILE"
+echo "Log MIME check    : $(file -b logs/payment-app.log)" | tee -a "$REPORT_FILE"
+
+cp configs/payment-service.conf backups/payment-service.conf.bak
+echo "Backup created    : backups/payment-service.conf.bak" | tee -a "$REPORT_FILE"
+
+# 3. Configuration Remediation (sed)
+echo -e "\n[3] AUTOMATED CONFIG REMEDIATION" | tee -a "$REPORT_FILE"
+sed -i 's/ENVIRONMENT=staging/ENVIRONMENT=production/g; s/LOG_LEVEL=DEBUG/LOG_LEVEL=ERROR/g; s|http://|https://|g' configs/payment-service.conf
+cat configs/payment-service.conf | tee -a "$REPORT_FILE"
+
+# 4. Application Log Parsing & Aggregation (grep, cut, tr, awk)
+echo -e "\n[4] APPLICATION ERROR ANALYSIS" | tee -a "$REPORT_FILE"
+ERROR_COUNT=$(grep -c "ERROR" logs/payment-app.log || true)
+echo "Total ERROR events: $ERROR_COUNT" | tee -a "$REPORT_FILE"
+
+echo "Impacted Users (uppercase normalized):" | tee -a "$REPORT_FILE"
+grep "ERROR" logs/payment-app.log | cut -d'|' -f4 | cut -d'=' -f2 | tr -d ' ' | tr '[:lower:]' '[:upper:]' | sort -u | tee -a "$REPORT_FILE"
+
+echo "Error Status Breakdown & Average Latency:" | tee -a "$REPORT_FILE"
+awk -F'|' '/ERROR/ {
+  gsub(/ /, "", $5);
+  gsub(/latency=|ms/, "", $6);
+  sum += $6; count++;
+  print " -> " $1 " | " $3 " | " $5 " | " $6 "ms"
+}
+END {
+  if (count > 0) printf "Average Error Latency: %.2f ms\n", sum/count
+}' logs/payment-app.log | tee -a "$REPORT_FILE"
+
+# 5. Systemd Service & Journal Audit (systemctl, journalctl)
+echo -e "\n[5] SYSTEMD & JOURNALD HEALTH CHECK" | tee -a "$REPORT_FILE"
+echo "Systemd State     : $(systemctl is-system-running || true)" | tee -a "$REPORT_FILE"
+echo "Recent System Logs (Last 5 entries):" | tee -a "$REPORT_FILE"
+journalctl -n 5 --no-pager | tee -a "$REPORT_FILE"
+
+# 6. Workspace Cleanup (rm)
+echo -e "\n[6] TEMPORARY ARTIFACT CLEANUP" | tee -a "$REPORT_FILE"
+rm -fv logs/*.tmp | tee -a "$REPORT_FILE"
+
+echo -e "\nTriage complete. Report saved to: $REPORT_FILE"
+EOF
+
+chmod +x scripts/incident_triage.sh
+Use code with caution.
+
+Step 3: Execute & Verify
+
+Run the script and inspect the generated directory tree:
+bash
+./scripts/incident_triage.sh
+ls -la backups/ reports/
+Use code with caution.
+
+4. Screenshots to Capture for LinkedIn (Carousel Strategy)
+
+LinkedIn posts with 3 to 4 crisp, high-contrast terminal screenshots get significantly higher engagement than text-only posts. Capture these four shots in Killercoda:
+1. Screenshot 1 (The Problem & Setup): Terminal output showing ls -la of your workspace and the broken configs/payment-service.conf (staging, DEBUG, http://) alongside the raw logs/payment-app.log.
+2. Screenshot 2 (The Script Execution): The terminal output of ./scripts/incident_triage.sh showing sections [1] through [4]—specifically highlighting the binary checks (which/type), automatic sed config fix, and awk latency calculation.
+3. Screenshot 3 (Systemd & Journald Verification): The bottom half of the output showing sections [5] and [6] (systemctl is-system-running, journalctl -n 5, and rm -fv cleaning the stale temp file).
+4. Screenshot 4 (GitHub Repository View): A clean screenshot of your GitHub repository showing the organized folder structure (scripts/, configs/, reports/, and README.md).
+
+5. Publishing to GitHub (Before Your Killercoda Session Expires)
+
+Create a new public repository on GitHub named linux-incident-triage-toolkit and push your code from Killercoda (using a GitHub Personal Access Token) or upload the files directly via the GitHub web UI:
+• README.md (Document the problem, architecture, and paste your actual terminal output)
+• scripts/incident_triage.sh
+• configs/payment-service.conf
+• logs/payment-app.log
+• reports/incident_summary_<timestamp>.txt
+
+6. Ready-to-Paste LinkedIn Post
+
+LinkedIn Portfolio Showcase Post
+🚀 Learning Linux in Public: Building an Automated Production Incident Triage Toolkit
+As part of my hands-on DevOps & Linux Administration journey, I wanted to go beyond memorizing isolated commands and prove how they work together during a real production incident.
+Using an Ubuntu 24.04 LTS lab environment on Killercoda, I built a Bash-based Incident Triage & Remediation Toolkit that simulates a live service alert—combining 17 core Linux utilities into a single automated workflow:
+🔹 System & Toolchain Verification: Used uname, command -v, which, and type to audit kernel architecture and verify required binaries before execution.
+🔹 Safe Workspace & Artifact Management: Used pwd, cd, ls, file, and cp to validate MIME types and create timestamped config backups before touching any settings.
+🔹 Automated Config Remediation: Used sed to patch misconfigured staging flags, debug logging, and insecure HTTP endpoints in place.
+🔹 Log Triage & Latency Analysis: Combined grep, cut, tr, and awk to isolate 5xx errors, normalize impacted user IDs, and calculate average failure latency.
+🔹 System Health & Cleanup: Queried systemctl and journalctl for host-level diagnostics, then cleaned stale temporary artifacts with rm.
+💡 Key Takeaway:
+In real-world SRE and Production Support, speed and safety matter equally. Backing up configurations (cp) and verifying file types (file) before running stream editors (sed) prevents small incidents from becoming full outages.
+🔗 Explore the full script, sample logs, and generated triage report on GitHub:
+[Paste Your GitHub Repository Link Here]
+Swipe through the screenshots below to see the simulated incident, script execution, and generated report in action! 👇
+If you are also learning Linux, DevOps, or Cloud Engineering—what is your go-to command combination when troubleshooting a broken service? Let’s connect and learn together!
+#Linux #LinuxAdministration #DevOps #SRE #PlatformEngineering #LearnInPublic #HandsOnLearning #BashScripting #SystemAdministration #CloudEngineering #GitHub #TechPortfolio
+
+Recommended LinkedIn Hashtags Breakdown
+
+• Core Domain: #Linux #LinuxAdministration #SystemAdministration #BashScripting
+• Career & Role Alignment: #DevOps #SRE #PlatformEngineering #CloudEngineering #ProductionSupport
+• Community & Growth: #LearnInPublic #HandsOnLearning #GitHub #TechPortfolio
+Once you run the setup and script in Killercoda, paste your actual terminal output or share your GitHub repository structure—I can generate a complete, copy-pasteable README.md tailored to your exact output so your repo looks senior-level to recruiters.
+Try without personalization
