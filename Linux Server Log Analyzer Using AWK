@@ -1,0 +1,274 @@
+1. Project title
+Linux Server Log Analyzer Using AWK
+Automated Log Analysis and Monitoring with Linux Commands
+
+2. Why are we doing this project?
+Imagine you are working in a DevOps team. Your application is running on a server, and the server generates logs whenever users visit your website.
+
+The log contains:
+- IP addresses
+- Request details
+- HTTP status codes
+- Date and time
+- Website paths
+When hundreds of log entries are generated, manually checking them is difficult.
+
+This project will use Linux commands to automatically analyze the log file and help the team:
+- Identify failed HTTP requests.
+- Find the most frequent visitors (IP addresses).
+- Count successful and failed HTTP requests.
+- Identify HTTP error codes.
+- Generate a simple report.
+3. What will your project look like?
+#chatgpt-mermaid-_r_rh_{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";font-size:16px;fill:rgb(237, 237, 237);}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#chatgpt-mermaid-_r_rh_ .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_rh_ .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_rh_ .error-icon{fill:rgb(48, 48, 48);}#chatgpt-mermaid-_r_rh_ .error-text{fill:rgb(237, 237, 237);stroke:rgb(237, 237, 237);}#chatgpt-mermaid-_r_rh_ .edge-thickness-normal{stroke-width:1px;}#chatgpt-mermaid-_r_rh_ .edge-thickness-thick{stroke-width:3.5px;}#chatgpt-mermaid-_r_rh_ .edge-pattern-solid{stroke-dasharray:0;}#chatgpt-mermaid-_r_rh_ .edge-thickness-invisible{stroke-width:0;fill:none;}#chatgpt-mermaid-_r_rh_ .edge-pattern-dashed{stroke-dasharray:3;}#chatgpt-mermaid-_r_rh_ .edge-pattern-dotted{stroke-dasharray:2;}#chatgpt-mermaid-_r_rh_ .marker{fill:rgb(175, 175, 175);stroke:rgb(175, 175, 175);}#chatgpt-mermaid-_r_rh_ .marker.cross{stroke:rgb(175, 175, 175);}#chatgpt-mermaid-_r_rh_ svg{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";font-size:16px;}#chatgpt-mermaid-_r_rh_ p{margin:0;}#chatgpt-mermaid-_r_rh_ .label{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";color:rgb(237, 237, 237);}#chatgpt-mermaid-_r_rh_ .cluster-label text{fill:rgb(237, 237, 237);}#chatgpt-mermaid-_r_rh_ .cluster-label span{color:rgb(237, 237, 237);}#chatgpt-mermaid-_r_rh_ .cluster-label span p{background-color:transparent;}#chatgpt-mermaid-_r_rh_ .label text,#chatgpt-mermaid-_r_rh_ span{fill:rgb(237, 237, 237);color:rgb(237, 237, 237);}#chatgpt-mermaid-_r_rh_ .node rect,#chatgpt-mermaid-_r_rh_ .node circle,#chatgpt-mermaid-_r_rh_ .node ellipse,#chatgpt-mermaid-_r_rh_ .node polygon,#chatgpt-mermaid-_r_rh_ .node path{fill:rgb(9, 23, 44);stroke:rgb(31, 78, 148);stroke-width:1px;}#chatgpt-mermaid-_r_rh_ .rough-node .label text,#chatgpt-mermaid-_r_rh_ .node .label text,#chatgpt-mermaid-_r_rh_ .image-shape .label,#chatgpt-mermaid-_r_rh_ .icon-shape .label{text-anchor:middle;}#chatgpt-mermaid-_r_rh_ .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#chatgpt-mermaid-_r_rh_ .rough-node .label,#chatgpt-mermaid-_r_rh_ .node .label,#chatgpt-mermaid-_r_rh_ .image-shape .label,#chatgpt-mermaid-_r_rh_ .icon-shape .label{text-align:center;}#chatgpt-mermaid-_r_rh_ .node.clickable{cursor:pointer;}#chatgpt-mermaid-_r_rh_ .root .anchor path{fill:rgb(175, 175, 175)!important;stroke-width:0;stroke:rgb(175, 175, 175);}#chatgpt-mermaid-_r_rh_ .arrowheadPath{fill:rgb(175, 175, 175);}#chatgpt-mermaid-_r_rh_ .edgePath .path{stroke:rgb(175, 175, 175);stroke-width:1px;}#chatgpt-mermaid-_r_rh_ .flowchart-link{stroke:rgb(175, 175, 175);fill:none;}#chatgpt-mermaid-_r_rh_ .edgeLabel{background-color:rgb(0, 0, 0);text-align:center;}#chatgpt-mermaid-_r_rh_ .edgeLabel p{background-color:rgb(0, 0, 0);}#chatgpt-mermaid-_r_rh_ .edgeLabel rect{opacity:0.5;background-color:rgb(0, 0, 0);fill:rgb(0, 0, 0);}#chatgpt-mermaid-_r_rh_ .labelBkg{background-color:rgba(0, 0, 0, 0.5);}#chatgpt-mermaid-_r_rh_ .cluster rect{fill:rgb(48, 48, 48);stroke:rgba(255, 255, 255, 0.15);stroke-width:1px;}#chatgpt-mermaid-_r_rh_ .cluster text{fill:rgb(237, 237, 237);}#chatgpt-mermaid-_r_rh_ .cluster span{color:rgb(237, 237, 237);}#chatgpt-mermaid-_r_rh_ div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";font-size:12px;background:rgb(48, 48, 48);border:1px solid rgba(255, 255, 255, 0.15);border-radius:2px;pointer-events:none;z-index:100;}#chatgpt-mermaid-_r_rh_ .flowchartTitleText{text-anchor:middle;font-size:18px;fill:rgb(237, 237, 237);}#chatgpt-mermaid-_r_rh_ rect.text{fill:none;stroke-width:0;}#chatgpt-mermaid-_r_rh_ .icon-shape,#chatgpt-mermaid-_r_rh_ .image-shape{background-color:rgb(0, 0, 0);text-align:center;}#chatgpt-mermaid-_r_rh_ .icon-shape p,#chatgpt-mermaid-_r_rh_ .image-shape p{background-color:rgb(0, 0, 0);padding:2px;}#chatgpt-mermaid-_r_rh_ .icon-shape .label rect,#chatgpt-mermaid-_r_rh_ .image-shape .label rect{opacity:0.5;background-color:rgb(0, 0, 0);fill:rgb(0, 0, 0);}#chatgpt-mermaid-_r_rh_ .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#chatgpt-mermaid-_r_rh_ .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#chatgpt-mermaid-_r_rh_ .node .neo-node{stroke:rgb(31, 78, 148);}#chatgpt-mermaid-_r_rh_ [data-look="neo"].node rect,#chatgpt-mermaid-_r_rh_ [data-look="neo"].cluster rect,#chatgpt-mermaid-_r_rh_ [data-look="neo"].node polygon{stroke:url(#chatgpt-mermaid-_r_rh_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_rh_ [data-look="neo"].swimlane.cluster rect{filter:none;}#chatgpt-mermaid-_r_rh_ [data-look="neo"].node path{stroke:url(#chatgpt-mermaid-_r_rh_-gradient);stroke-width:1px;}#chatgpt-mermaid-_r_rh_ [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_rh_ [data-look="neo"].node .neo-line path{stroke:rgb(31, 78, 148);filter:none;}#chatgpt-mermaid-_r_rh_ [data-look="neo"].node circle{stroke:url(#chatgpt-mermaid-_r_rh_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_rh_ [data-look="neo"].node circle .state-start{fill:#000000;}#chatgpt-mermaid-_r_rh_ [data-look="neo"].icon-shape .icon{fill:url(#chatgpt-mermaid-_r_rh_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_rh_ [data-look="neo"].icon-shape .icon-neo path{stroke:url(#chatgpt-mermaid-_r_rh_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_rh_ .node text{font-size:14px;font-weight:600;letter-spacing:normal;fill:rgb(153, 206, 255);}#chatgpt-mermaid-_r_rh_ .edgeLabels text{font-size:13px;font-weight:600;letter-spacing:-0.08px;fill:rgb(153, 206, 255);}#chatgpt-mermaid-_r_rh_ .node tspan[font-weight="normal"],#chatgpt-mermaid-_r_rh_ .edgeLabels tspan[font-weight="normal"]{font-weight:600;}#chatgpt-mermaid-_r_rh_ .edgeLabel .label rect{opacity:1;rx:13px;ry:13px;fill:rgb(0, 14, 26);stroke:rgb(26, 62, 95);stroke-width:1px;}#chatgpt-mermaid-_r_rh_ .node rect,#chatgpt-mermaid-_r_rh_ .node circle,#chatgpt-mermaid-_r_rh_ .node ellipse,#chatgpt-mermaid-_r_rh_ .node polygon,#chatgpt-mermaid-_r_rh_ .node path{fill:rgb(0, 40, 77);stroke:rgba(255, 255, 255, 0.1);stroke-width:1px;}#chatgpt-mermaid-_r_rh_ .node rect{rx:16px;ry:16px;}#chatgpt-mermaid-_r_rh_ .mermaid-decision .label-container{fill:rgb(0, 14, 26);stroke:rgb(26, 62, 95);stroke-dasharray:2,2;}#chatgpt-mermaid-_r_rh_ .edgePaths .flowchart-link{stroke:rgb(175, 175, 175);stroke-width:1px;stroke-linecap:round;stroke-linejoin:round;}#chatgpt-mermaid-_r_rh_ .marker{fill:rgb(175, 175, 175);stroke:rgb(175, 175, 175);}#chatgpt-mermaid-_r_rh_ :root{--mermaid-font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";}Server log fileLinux AWK AnalyzerSuccessful requestsFailed requestsTop IP addressesError code summaryFinal report
+
+
+
+
+
+4. Step 1 — Open KillerCoda
+1. Open KillerCoda.
+2. Choose a Linux playground (Ubuntu or a Linux terminal environment).
+3. Open the terminal.
+We will create our project from scratch.
+5. Step 2 — Create your project folder
+Execute these commands one by one:
+mkdir awk-log-analyzer
+
+
+cd awk-log-analyzer
+
+
+mkdir reports
+
+
+What did you do? You created a project folder and a subfolder to store the reports.
+6. Step 3 — Create a sample server log
+We don't need a real server. We will create a simulated server log file that resembles real application activity.
+
+Run:
+cat > file.txt <<'EOF'
+192.168.1.10 GET /home 200 1024
+192.168.1.20 GET /login 200 850
+192.168.1.30 GET /admin 403 512
+192.168.1.10 GET /products 200 2048
+192.168.1.40 GET /login 404 400
+192.168.1.20 GET /dashboard 200 1500
+192.168.1.50 GET /api 500 700
+192.168.1.30 GET /home 200 1200
+192.168.1.10 GET /checkout 200 3000
+192.168.1.40 GET /admin 403 600
+192.168.1.60 GET /about 200 900
+192.168.1.50 GET /api/users 500 850
+192.168.1.20 GET /contact 200 700
+192.168.1.70 GET /login 404 450
+192.168.1.10 GET /home 200 1100
+EOF
+
+
+Understand your log file
+Column	Example	Meaning
+$1	192.168.1.10	IP address
+$2	GET	HTTP method
+$3	/home	Requested path
+$4	200	HTTP status code
+$5	1024	Response size in bytes
+
+Check your log:
+cat file.txt
+
+
+Your simulated server log is ready.
+
+7. Step 4 — Create the automated analysis script
+We will create one script that automatically performs the analysis instead of manually running 25 different commands.
+
+Run:
+nano analyzer.sh
+
+
+If Nano opens, paste the entire script below.
+#!/bin/bash
+
+LOG_FILE="file.txt"
+REPORT="reports/analysis_report.txt"
+
+if [ ! -f "$LOG_FILE" ]; then
+    echo "Log file not found!"
+    exit 1
+fi
+
+echo "===== SERVER LOG ANALYSIS =====" > "$REPORT"
+
+echo "" >> "$REPORT"
+echo "Total Requests:" >> "$REPORT"
+awk 'END {print NR}' "$LOG_FILE" >> "$REPORT"
+
+echo "" >> "$REPORT"
+echo "Successful Requests (200):" >> "$REPORT"
+awk '$4 == 200 {count++} END {print count+0}' "$LOG_FILE" >> "$REPORT"
+
+echo "" >> "$REPORT"
+echo "Failed Requests (400 and 500):" >> "$REPORT"
+awk '$4 >= 400 {count++} END {print count+0}' "$LOG_FILE" >> "$REPORT"
+
+echo "" >> "$REPORT"
+echo "Error Status Summary:" >> "$REPORT"
+awk '$4 >= 400 {count[$4]++} END {for (code in count) print code, count[code]}' "$LOG_FILE" >> "$REPORT"
+
+echo "" >> "$REPORT"
+echo "Top IP Addresses:" >> "$REPORT"
+awk '{count[$1]++} END {for (ip in count) print count[ip], ip}' "$LOG_FILE" | sort -nr | head -5 >> "$REPORT"
+
+echo "" >> "$REPORT"
+echo "Failed Requests Details:" >> "$REPORT"
+awk '$4 >= 400 {print $1, $3, $4}' "$LOG_FILE" >> "$REPORT"
+
+echo "" >> "$REPORT"
+echo "===== ANALYSIS COMPLETED =====" >> "$REPORT"
+
+cat "$REPORT"
+
+
+How to save in Nano?
+1. Press Ctrl + O (save).
+2. Press Enter to confirm the filename.
+3. Press Ctrl + X to exit.
+8. Step 5 — Give execution permission
+Run:
+chmod +x analyzer.sh
+
+
+Why? chmod +x allows the script to be executed.
+9. Step 6 — Run your project
+Execute:
+./analyzer.sh
+
+
+Your script will automatically analyze the log and display a report.
+Expected output (approximately)
+===== SERVER LOG ANALYSIS =====
+
+Total Requests:
+15
+
+Successful Requests (200):
+9
+
+Failed Requests (400 and 500):
+6
+
+Error Status Summary:
+500 2
+404 3
+403 2
+
+Top IP Addresses:
+4 192.168.1.10
+3 192.168.1.20
+2 192.168.1.40
+2 192.168.1.30
+2 192.168.1.50
+
+Failed Requests Details:
+192.168.1.30 /admin 403
+192.168.1.40 /login 404
+192.168.1.50 /api 500
+192.168.1.40 /admin 403
+192.168.1.50 /api/users 500
+192.168.1.70 /login 404
+
+===== ANALYSIS COMPLETED =====
+
+
+Note: The ordering of the error status summary may vary because awk iterates through associative arrays in no guaranteed order.
+
+10. Step 7 — Understand what your script does
+Command	What it does
+awk 'END {print NR}'	Counts the total number of log lines.
+awk '$4 == 200'	Filters successful requests.
+awk '$4 >= 400'	Filters HTTP error requests.
+count[$4]++	Counts how many times each error code appears.
+count[$1]++	Counts requests from each IP address.
+sort -nr	Sorts numbers in descending order.
+head -5	Displays the first 5 results.
+cat "$REPORT"	Displays the generated report.
+chmod +x	Gives the script executable permission.
+
+11. Step 8 — Check your generated report
+Your report is automatically saved inside the reports folder.
+
+Run:
+ls reports
+
+
+You should see:
+analysis_report.txt
+
+
+Read the report:
+cat reports/analysis_report.txt
+
+
+Project output
+
+You've now built a Linux shell script that reads server logs, analyzes traffic and errors, and creates a report automatically.
+
+
+12. Step 9 — Create a README file
+A README explains your project to anyone who visits your GitHub repository.
+
+Run:
+nano README.md
+
+
+Paste this:
+# Linux Server Log Analyzer Using AWK
+
+## Project Overview
+This project automates server log analysis using Linux
+commands and AWK.
+
+## Objective
+To analyze simulated server logs and identify:
+- Total requests
+- Successful requests
+- Failed requests
+- Error status codes
+- Top IP addresses
+- Failed request details
+
+## Technologies Used
+- Linux
+- Bash Shell Scripting
+- AWK
+- sort
+- head
+
+## Project Files
+- file.txt - Sample server log
+- analyzer.sh - Analysis automation script
+- reports/analysis_report.txt - Generated report
+
+## How to Execute
+
+1. Clone or download the repository.
+2. Open the Linux terminal.
+3. Run:
+
+chmod +x analyzer.sh
+
+4. Execute:
+
+./analyzer.sh
+
+## DevOps Use Case
+This project demonstrates basic log monitoring and
+troubleshooting techniques used by DevOps engineers
+to analyze application activity and identify errors.
+
+## Disclaimer
+This project uses simulated log data for learning.
+
+
+Save using Ctrl + O, Enter, Ctrl + X.
